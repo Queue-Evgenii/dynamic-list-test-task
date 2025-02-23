@@ -41,7 +41,10 @@ export default defineComponent({
     const itemsPerPage = 20;
 
     getProducts()
-      .then((data) => (products.value = data.products))
+      .then((data) => {
+        products.value = data.products;
+        currentPage.value = 1;
+      })
       .catch((err) => console.log("getProducts ERR", err))
       .finally(() => (isLoading.value = false));
 
@@ -64,7 +67,10 @@ export default defineComponent({
     const searchHandler = (value: string) => {
       isLoading.value = true;
       searchProducts(value)
-        .then((data) => (products.value = data.products))
+        .then((data) => {
+          products.value = data.products;
+          currentPage.value = 1;
+        })
         .catch((err) => console.log("searchProducts ERR", err))
         .finally(() => (isLoading.value = false));
     };
