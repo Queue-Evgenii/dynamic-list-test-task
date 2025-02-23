@@ -1,0 +1,32 @@
+._flex {
+  display: flex;
+}
+._fd-col {
+  flex-direction: column;
+}
+
+._ai-c {
+  align-items: center;
+}
+
+._flex-0-33p {
+  flex: 0 0 33.333%
+}
+
+/* -------------- Y (Row) Gaps --------------- */
+
+._gap-y-8 {
+  row-gap: 8px
+}
+._gap-y-16 {
+  row-gap: 16px;
+}
+
+/* -------------- X (Column) Gaps --------------- */
+
+._gap-x-8 {
+  column-gap: 8px;
+}
+._gap-x-32 {
+  column-gap: 32px;
+}
