@@ -12,17 +12,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
+
 import ListComponent from "@/components/list/ListComponent.vue";
-import { getProducts } from "@/api/products";
+import SearchComponent from "@/components/search/SearchComponent.vue";
+import LoaderComponent from "@/components/loader/LoaderComponent.vue";
+
 import { Product } from "@/interfaces/product";
+
+import { getProducts } from "@/api/products";
+import { searchProducts } from "@/api/search";
 
 import "@/styles/reset.css";
 import "@/styles/main.css";
 import "@/styles/flex.css";
-import SearchComponent from "@/components/search/SearchComponent.vue";
-import { searchProducts } from "@/api/search";
-import LoaderComponent from "@/components/loader/LoaderComponent.vue";
 
 export default defineComponent({
   name: "App",
@@ -42,11 +45,16 @@ export default defineComponent({
       .catch((err) => console.log("getProducts ERR", err))
       .finally(() => (isLoading.value = false));
 
+    const visibleProducts = computed((): Product[] => {
+      return products.value.slice(0, currentPage.value * itemsPerPage);
+    });
+
     const nextPage = () => {
       if (currentPage.value * itemsPerPage >= products.value.length) return;
       currentPage.value += 1;
     };
 
+    // Can be optimized by debouce function, later...
     const scrollHandler = (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.scrollHeight - target.scrollTop <= target.clientHeight + 10)
@@ -63,17 +71,13 @@ export default defineComponent({
 
     return {
       products,
+      visibleProducts,
       currentPage,
       itemsPerPage,
       isLoading,
       scrollHandler,
       searchHandler,
     };
-  },
-  computed: {
-    visibleProducts(): Product[] {
-      return this.products.slice(0, this.currentPage * this.itemsPerPage);
-    },
   },
 });
 </script>
