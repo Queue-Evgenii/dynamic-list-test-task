@@ -2,7 +2,12 @@
   <div class="container _flex _fd-col _gap-y-16">
     <search-component @update:query="searchHandler" />
     <loader-component v-if="isLoading" style="padding: 20px 0" />
-    <list-component v-else :list="products" />
+    <list-component
+      v-else-if="visibleProducts.length > 0"
+      :list="visibleProducts"
+      @scroll="scrollHandler"
+    />
+    <div v-else>Products not found! {{ ":<" }}</div>
   </div>
 </template>
 
@@ -29,10 +34,24 @@ export default defineComponent({
   setup() {
     const products = ref<Product[]>([]);
     const isLoading = ref(true);
+    const currentPage = ref(1);
+    const itemsPerPage = 20;
+
     getProducts()
       .then((data) => (products.value = data.products))
       .catch((err) => console.log("getProducts ERR", err))
       .finally(() => (isLoading.value = false));
+
+    const nextPage = () => {
+      if (currentPage.value * itemsPerPage >= products.value.length) return;
+      currentPage.value += 1;
+    };
+
+    const scrollHandler = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.scrollHeight - target.scrollTop <= target.clientHeight + 10)
+        nextPage();
+    };
 
     const searchHandler = (value: string) => {
       isLoading.value = true;
@@ -44,9 +63,17 @@ export default defineComponent({
 
     return {
       products,
-      searchHandler,
+      currentPage,
+      itemsPerPage,
       isLoading,
+      scrollHandler,
+      searchHandler,
     };
+  },
+  computed: {
+    visibleProducts(): Product[] {
+      return this.products.slice(0, this.currentPage * this.itemsPerPage);
+    },
   },
 });
 </script>
